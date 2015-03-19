@@ -9,9 +9,9 @@
 # Description:       Enable service provided by daemon.
 ### END INIT INFO
 
-dir=""
-user=""
-cmd=""
+dir="/home/root/node_modules/bleno"
+#user=""
+cmd="node demo.js"
 
 name=`basename $0`
 pid_file="/var/run/$name.pid"
@@ -23,7 +23,7 @@ get_pid() {
 }
 
 is_running() {
-    [ -f "$pid_file" ] && ps `get_pid` > /dev/null 2>&1
+    [ -f "$pid_file" ] && ps | grep `get_pid` | grep -v grep > /dev/null 2>&1
 }
 
 case "$1" in
@@ -33,6 +33,12 @@ case "$1" in
     else
         echo "Starting $name"
         cd "$dir"
+        
+        #I feel bad about this. Included solely for issue with bleno/bluetoothd
+        rfkill unblock bluetooth >> "$stdout_log" 2>> "$stderr_log" &
+        killall bluetoothd >> "$stdout_log" 2>> "$stderr_log" &
+        hciconfig hci0 up >> "$stdout_log" 2>> "$stderr_log" &
+        
         sudo -u "$user" $cmd >> "$stdout_log" 2>> "$stderr_log" &
         echo $! > "$pid_file"
         if ! is_running; then
