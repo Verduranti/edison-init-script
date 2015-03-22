@@ -34,12 +34,14 @@ case "$1" in
         echo "Starting $name"
         cd "$dir"
         
+        #Instead I chose to permanently disable bluetooth
+        #I used: systemctl disable bluetooth
         #I feel bad about this. Included solely for issue with bleno/bluetoothd
-        rfkill unblock bluetooth >> "$stdout_log" 2>> "$stderr_log" &
-        killall bluetoothd >> "$stdout_log" 2>> "$stderr_log" &
-        hciconfig hci0 up >> "$stdout_log" 2>> "$stderr_log" &
+        #rfkill unblock bluetooth >> "$stdout_log" 2>> "$stderr_log" &
+        #killall bluetoothd >> "$stdout_log" 2>> "$stderr_log" &
+        #hciconfig hci0 up >> "$stdout_log" 2>> "$stderr_log" &
         
-        sudo -u "$user" $cmd >> "$stdout_log" 2>> "$stderr_log" &
+        $cmd >> "$stdout_log" 2>> "$stderr_log" &
         echo $! > "$pid_file"
         if ! is_running; then
             echo "Unable to start, see $stdout_log and $stderr_log"
